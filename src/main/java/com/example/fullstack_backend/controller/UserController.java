@@ -1,5 +1,6 @@
 package com.example.fullstack_backend.controller;
 
+import com.example.fullstack_backend.exception.UserNotFoundException;
 import com.example.fullstack_backend.model.User;
 import com.example.fullstack_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,17 @@ public class UserController {
   User getUserById(@PathVariable Long id){
     return userRepository.findById(id)
             .orElseThrow(()->  new UserNotFoundException(id));
+  }
+
+  @PutMapping("/user/id")
+  User updateUser(@RequestBody User newUser,@PathVariable Long id){
+    return userRepository.findBy(id)
+            .map(user->{
+              user.setUsername(newUser.getUsername());
+              user.setName(newUser.getName());
+              user.setEmail(newUser.getEmail());
+              return  userRepository.save(user);
+
+            }).orElseThrow(()->new UserNotFoundException(id));
   }
 }
